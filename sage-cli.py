@@ -7,6 +7,18 @@ import json
 import logging
 import sage_storage
 
+# storage:
+# bucket
+#        create
+#        show
+#        list
+# bucket-permission
+#        add
+#        delete
+# files --bucket_id
+#        list
+#        upload
+#        download
 
 
 
@@ -37,16 +49,23 @@ def storage(ctx):
     pass
 
 
-@storage.group(help='bucket')
+@storage.group(help='bucket operations (create, list, ...)')
 @click.pass_context
 def bucket(ctx):
     pass
-    #click.echo('Debug is %s' % (ctx.obj['DEBUG'] and 'on' or 'off'))
-    #print(ctx)
+   
+@storage.group(help='bucket permissions (private, public, sharing, ...)')
+@click.pass_context
+def permissions(ctx):
+    pass
+
+@storage.group(help='file operations (upload, download, list, ...)')
+@click.pass_context
+def files(ctx):
+    pass
 
 
-
-@bucket.command(help='create bucket', name='create')
+@bucket.command(help='create a new bucket', name='create')
 @click.pass_context
 @click.option('--name', help='name of bucket')
 @click.option('--datatype', required=True, help='datatype of bucket')
@@ -63,7 +82,44 @@ def bucketCreate(ctx, name, datatype):
 
     
     print(json.dumps(bucket, indent=2))
+
+
+@bucket.command(help='show bucket', name='show')
+@click.pass_context
+@click.argument('id')
+def bucketShow(ctx, id):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
    
+    try:
+        bucket = sage_storage.showBucket(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id, debug=debug)
+    except Exception as e:
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(e)
+
+    
+    print(json.dumps(bucket, indent=2))
+
+
+@bucket.command(help='list buckets', name='list')
+@click.pass_context
+def bucketList(ctx):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        bucket = sage_storage.listBuckets(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], debug=debug)
+    except Exception as e:
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(e)
+
+    
+    print(json.dumps(bucket, indent=2))
+
 
 # edge code repository
 @cli.command(help='SAGE edge code repository (not implemented)')
