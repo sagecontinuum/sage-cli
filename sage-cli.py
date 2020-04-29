@@ -121,6 +121,59 @@ def bucketList(ctx):
     print(json.dumps(bucket, indent=2))
 
 
+
+@permissions.command(help='get bucket permissions', name='show')
+@click.pass_context
+@click.argument('id')
+def bucketGetPermissions(ctx, id):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        p = sage_storage.getPermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id, debug=debug)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(p, indent=2))
+
+
+
+#{"granteeType": "USER", "grantee": "otheruser", "permission": "READ"}'
+@permissions.command(short_help='add bucket permissions', name='add')
+@click.pass_context
+@click.argument('bucket_id')
+@click.argument('granteetype')  # USER or GROUP
+@click.argument('grantee')      # user or group to get permission
+@click.argument('permission')   # possible permisson: READ, WRITE, READ_ACL, WRITE_ACL
+def bucketAddPermissions(ctx, bucket_id, granteetype, grantee, permission):
+    # example: <BUCKET_ID> USER  otheruser READ 
+   
+    try:
+        p = sage_storage.addPermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(p, indent=2))
+
+
+@permissions.command(short_help='make bucket public', name='public')
+@click.pass_context
+@click.argument('bucket_id')
+def bucketMakePublic(ctx, bucket_id):
+  
+    try:
+        p = sage_storage.makePublic(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(p, indent=2))
+
+
 # edge code repository
 @cli.command(help='SAGE edge code repository (not implemented)')
 @click.pass_context
