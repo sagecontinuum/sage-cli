@@ -103,6 +103,25 @@ def bucketShow(ctx, id):
     print(json.dumps(bucket, indent=2))
 
 
+@bucket.command(help='delete bucket', name='delete')
+@click.pass_context
+@click.argument('id')
+def bucketDelete(ctx, id):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        bucket = sage_storage.deleteBucket(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id, debug=debug)
+    except Exception as e:
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(e)
+
+    
+    print(json.dumps(bucket, indent=2))
+
+
 @bucket.command(help='list buckets', name='list')
 @click.pass_context
 def bucketList(ctx):
@@ -173,6 +192,45 @@ def bucketMakePublic(ctx, bucket_id):
     
     print(json.dumps(p, indent=2))
 
+
+
+@files.command(help='upload file', name='upload')
+@click.pass_context
+@click.argument('bucket_id')
+@click.argument('file')
+@click.option('--key', help='remote path and filename')
+def fileUpload(ctx, bucket_id, file, key):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        result = sage_storage.uploadFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, localFile=file, key=key)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(result, indent=2))
+
+@files.command(help='get listing', name='list')
+@click.pass_context
+@click.argument('bucket_id')
+@click.option('--prefix', help='choose subdirectory')
+@click.option('--recursive', default=False)
+def filesList(ctx, bucket_id, prefix, recursive):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        result = sage_storage.listFiles(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, prefix=prefix, recursive=recursive)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(result, indent=2))
 
 # edge code repository
 @cli.command(help='SAGE edge code repository (not implemented)')
