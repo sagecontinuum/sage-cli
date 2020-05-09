@@ -82,7 +82,8 @@ def bucketCreate(ctx, name, datatype):
 
     
     print(json.dumps(bucket, indent=2))
-
+    if 'error' in bucket:
+        sys.exit(1)
 
 @bucket.command(help='show bucket', name='show')
 @click.pass_context
@@ -101,6 +102,8 @@ def bucketShow(ctx, id):
 
     
     print(json.dumps(bucket, indent=2))
+    if 'error' in bucket:
+        sys.exit(1)
 
 
 @bucket.command(help='delete bucket', name='delete')
@@ -120,6 +123,8 @@ def bucketDelete(ctx, id):
 
     
     print(json.dumps(bucket, indent=2))
+    if 'error' in bucket:
+        sys.exit(1)
 
 
 @bucket.command(help='list buckets', name='list')
@@ -138,13 +143,14 @@ def bucketList(ctx):
 
     
     print(json.dumps(bucket, indent=2))
-
+    if 'error' in bucket:
+        sys.exit(1)
 
 
 @permissions.command(help='get bucket permissions', name='show')
 @click.pass_context
 @click.argument('id')
-def bucketGetPermissions(ctx, id):
+def permissionsGet(ctx, id):
 
     debug = False
     if "DEBUG" in ctx.obj:
@@ -157,7 +163,9 @@ def bucketGetPermissions(ctx, id):
 
     
     print(json.dumps(p, indent=2))
-
+    if 'error' in p:
+        sys.exit(1)
+    
 
 
 #{"granteeType": "USER", "grantee": "otheruser", "permission": "READ"}'
@@ -167,7 +175,7 @@ def bucketGetPermissions(ctx, id):
 @click.argument('granteetype')  # USER or GROUP
 @click.argument('grantee')      # user or group to get permission
 @click.argument('permission')   # possible permisson: READ, WRITE, READ_ACL, WRITE_ACL
-def bucketAddPermissions(ctx, bucket_id, granteetype, grantee, permission):
+def permissionsAdd(ctx, bucket_id, granteetype, grantee, permission):
     # example: <BUCKET_ID> USER  otheruser READ 
    
     try:
@@ -177,6 +185,8 @@ def bucketAddPermissions(ctx, bucket_id, granteetype, grantee, permission):
 
     
     print(json.dumps(p, indent=2))
+    if 'error' in p:
+        sys.exit(1)
 
 
 @permissions.command(short_help='make bucket public', name='public')
@@ -191,6 +201,28 @@ def bucketMakePublic(ctx, bucket_id):
 
     
     print(json.dumps(p, indent=2))
+    if 'error' in p:
+        sys.exit(1)
+
+
+
+@permissions.command(short_help='delete a permission', name='delete')
+@click.pass_context
+@click.argument('bucket_id')
+@click.argument('granteetype')
+@click.argument('grantee')
+@click.option('--permission', help='remove only specific permission from grantee')
+def permissionDelete(ctx, bucket_id, granteetype, grantee, permission):
+  
+    try:
+        p = sage_storage.deletePermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(p, indent=2))
+    if 'error' in p:
+        sys.exit(1)
 
 
 
@@ -212,6 +244,33 @@ def fileUpload(ctx, bucket_id, file, key):
 
     
     print(json.dumps(result, indent=2))
+    if 'error' in result:
+        sys.exit(1)
+
+
+
+
+@files.command(help='download file', name='download')
+@click.pass_context
+@click.argument('bucket_id')
+@click.argument('key')
+@click.option('--target', help='target filename or directory')
+#@click.option('--key', help='remote path and filename')
+def fileUpload(ctx, bucket_id, key, target):
+
+   
+    try:
+        sage_storage.downloadFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, key=key,  target=target)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    #print(json.dumps(result, indent=2))
+    #if 'error' in result:
+    #    sys.exit(1)
+
+
+
 
 @files.command(help='get listing', name='list')
 @click.pass_context
@@ -231,6 +290,31 @@ def filesList(ctx, bucket_id, prefix, recursive):
 
     
     print(json.dumps(result, indent=2))
+    if 'error' in result:
+        sys.exit(1)
+
+@files.command(help='delete file', name='delete')
+@click.pass_context
+@click.argument('bucket_id')
+@click.argument('key')
+#@click.option('--prefix', help='choose subdirectory')
+#@click.option('--recursive', default=False)
+def filesList(ctx, bucket_id, key):
+
+    debug = False
+    if "DEBUG" in ctx.obj:
+        debug = ctx.obj['DEBUG']
+   
+    try:
+        result = sage_storage.deleteFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, key=key)
+    except Exception as e:
+        sys.exit(e)
+
+    
+    print(json.dumps(result, indent=2))
+    if 'error' in result:
+        sys.exit(1)
+
 
 # edge code repository
 @cli.command(help='SAGE edge code repository (not implemented)')
