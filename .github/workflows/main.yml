@@ -20,11 +20,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - run: |
-        git clone https://github.com/sagecontinuum/sage-storage-api.git
-        cd sage-storage-api
-        docker-compose up -d
-        cd ..
-        sleep 3
-        export SAGE_USER_TOKEN=user:testuser
-        export SAGE_HOST=http://localhost:8080
-        ./tests.sh
+          git clone https://github.com/sagecontinuum/sage-storage-api.git
+          cd sage-storage-api
+          docker-compose up -d
+          cd ..
+          sleep 3
+          export SAGE_USER_TOKEN=user:testuser
+          export SAGE_HOST=http://localhost:8080
+          ./tests.sh
