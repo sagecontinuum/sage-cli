@@ -1,5 +1,9 @@
 # sage-cli
 
+Command line client for SAGE
+
+
+![CI](https://github.com/sagecontinuum/sage-cli/workflows/CI/badge.svg)
 
 ## install 
 
