@@ -22,7 +22,7 @@ jobs:
       - run: |
           git clone https://github.com/sagecontinuum/sage-storage-api.git
           cd sage-storage-api
-          docker-compose up -d
+          docker-compose up --build -d
           cd ..
           sleep 3
           export SAGE_USER_TOKEN=user:testuser
