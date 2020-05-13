@@ -37,6 +37,11 @@ command -v jq
 
 BUCKET_ID=$(./sage-cli.py storage bucket create --datatype=training-data | jq -r '.id')
 
+
+if [ "${BUCKET_ID}_" == "_" ] ; then
+    fatal "BUCKET_IDis empty"
+fi
+
 echo "BUCKET_ID=${BUCKET_ID}"
 
 
