@@ -33,8 +33,10 @@ jobs:
       - id: install
         run: pip install .
       - id: run-tests
-        run: |  
+        run: |
+          docker ps  
           sleep 3
+          docker ps
           export SAGE_USER_TOKEN=user:testuser
           export SAGE_HOST=http://localhost:8080
           ./tests.sh
