@@ -26,6 +26,8 @@ jobs:
           cd sage-storage-api
           docker-compose up --build -d
           cd ..
+      - id: install
+        run: pip install .
       - id: run-tests
         run: |  
           sleep 3
