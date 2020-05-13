@@ -76,7 +76,8 @@ def bucketCreate(ctx, name, datatype):
     try:
         bucket = sage_storage.createBucket(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], datatype=datatype, name=name)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(bucket, indent=2))
@@ -94,7 +95,7 @@ def bucketShow(ctx, id):
         bucket = sage_storage.showBucket(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
         print("Unexpected error:", sys.exc_info()[0])
-        sys.exit(e)
+        sys.exit(1)
 
     
     print(json.dumps(bucket, indent=2))
@@ -113,7 +114,7 @@ def bucketDelete(ctx, id):
         bucket = sage_storage.deleteBucket(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
         print("Unexpected error:", sys.exc_info()[0])
-        sys.exit(e)
+        sys.exit(1)
 
     
     print(json.dumps(bucket, indent=2))
@@ -131,7 +132,7 @@ def bucketList(ctx):
         bucket = sage_storage.listBuckets(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'])
     except Exception as e:
         print("Unexpected error:", sys.exc_info()[0])
-        sys.exit(e)
+        sys.exit(1)
 
     
     print(json.dumps(bucket, indent=2))
@@ -149,7 +150,8 @@ def permissionsGet(ctx, id):
     try:
         p = sage_storage.getPermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(p, indent=2))
@@ -171,7 +173,8 @@ def permissionsAdd(ctx, bucket_id, granteetype, grantee, permission):
     try:
         p = sage_storage.addPermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(p, indent=2))
@@ -187,7 +190,8 @@ def bucketMakePublic(ctx, bucket_id):
     try:
         p = sage_storage.makePublic(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(p, indent=2))
@@ -207,7 +211,8 @@ def permissionDelete(ctx, bucket_id, granteetype, grantee, permission):
     try:
         p = sage_storage.deletePermissions(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(p, indent=2))
@@ -228,7 +233,8 @@ def fileUpload(ctx, bucket_id, file, key):
     try:
         result = sage_storage.uploadFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, localFile=file, key=key)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(result, indent=2))
@@ -250,7 +256,8 @@ def fileUpload(ctx, bucket_id, key, target):
     try:
         sage_storage.downloadFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, key=key,  target=target)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     #print(json.dumps(result, indent=2))
@@ -271,7 +278,8 @@ def filesList(ctx, bucket_id, prefix, recursive):
     try:
         result = sage_storage.listFiles(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, prefix=prefix, recursive=recursive)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(result, indent=2))
@@ -290,7 +298,8 @@ def filesList(ctx, bucket_id, key):
     try:
         result = sage_storage.deleteFile(host=ctx.obj['HOST'], token=ctx.obj['TOKEN'], bucketID=bucket_id, key=key)
     except Exception as e:
-        sys.exit(e)
+        print("Unexpected error:", sys.exc_info()[0])
+        sys.exit(1)
 
     
     print(json.dumps(result, indent=2))
