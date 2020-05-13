@@ -34,8 +34,9 @@ command -v jq
 
 # create bucket
 
-
-BUCKET_ID=$(./sage-cli.py storage bucket create --datatype=training-data | jq -r '.id')
+RESPONSE=$(./sage-cli.py storage bucket create --datatype=training-data)
+echo "RESPONSE: ${RESPONSE}"
+BUCKET_ID=$(cat ${RESPONSE} | jq -r '.id')
 
 
 if [ "${BUCKET_ID}_" == "_" ] ; then
