@@ -35,7 +35,7 @@ jobs:
       - id: run-tests
         run: |
           docker ps  
-          sleep 3
+          sleep 6
           docker ps
           export SAGE_USER_TOKEN=user:testuser
           export SAGE_HOST=http://localhost:8080
