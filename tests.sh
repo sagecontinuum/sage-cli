@@ -6,16 +6,24 @@
 # - jq installed
 # - SAGE_HOST and SAGE_USER_TOKEN environment variables
 
+fatal() {
+  echo -e '\033[0;31m' $* 
+  exit 1
+}
 
 if [ -z ${SAGE_HOST} ] ; then
-    echo "Environment variable SAGE_HOST not defined"
-    exit 1
+    fatal "Environment variable SAGE_HOST not defined"
 fi
 
 if [ -z ${SAGE_USER_TOKEN} ] ; then
-    echo "Environment variable SAGE_USER_TOKEN not defined"
-    exit 1
+    fatal "Environment variable SAGE_USER_TOKEN not defined"
 fi
+
+
+
+
+
+
 
 set -e
 set -x
@@ -26,8 +34,14 @@ command -v jq
 
 # create bucket
 
+RESPONSE=$(./sage-cli.py storage bucket create --datatype=training-data)
+echo "RESPONSE: ${RESPONSE}"
+BUCKET_ID=$(echo "${RESPONSE}" | jq -r '.id')
 
-BUCKET_ID=$(./sage-cli.py storage bucket create --datatype=training-data | jq -r '.id')
+
+if [ "${BUCKET_ID}_" == "_" ] ; then
+    fatal "BUCKET_IDis empty"
+fi
 
 echo "BUCKET_ID=${BUCKET_ID}"
 
@@ -39,8 +53,7 @@ echo "BUCKET_ID=${BUCKET_ID}"
 FILE_FOUND=$(./sage-cli.py storage files list ${BUCKET_ID} |  jq -r '.[0]')
 
 if [ ${FILE_FOUND}_ != "README.md_" ] ; then
-    echo "file not found"
-    exit 1
+    fatal "file not found"
 fi
 
 
@@ -61,8 +74,7 @@ rm temp/test.md
 FIELD_COUNT=$(./sage-cli.py storage permissions show ${BUCKET_ID} | jq  '.[] | select(.grantee=="AllUsers") | select(.permission=="READ") | length')
 
 if [ ${FIELD_COUNT} -ne 3 ] ; then
-    echo "permission not found"
-    exit 1
+    fatal "permission not found"
 fi
 
 
@@ -72,8 +84,7 @@ fi
 # check that AllUsers has no permissions
 PERM_COUNT=$(./sage-cli.py storage permissions show  d73cae07-0e56-4521-a662-e312def56540 | jq  '.[] | select(.grantee=="AllUsers") ' | wc -l)
 if [ ${PERM_COUNT} -ne 0 ] ; then
-    echo "AllUsers still has permissions"
-    exit 1
+    fatal "AllUsers still has permissions"
 fi
 
 
