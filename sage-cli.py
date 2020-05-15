@@ -9,17 +9,44 @@ import sage_storage
 
 # storage:
 # bucket
-#        create
-#        show
-#        list
-# bucket-permission
-#        add
-#        delete
-# files --bucket_id
-#        list
-#        upload
-#        download
+#       create
+#       delete
+#       show
+#       list
+#       (rename)
+# permissions
+#       add
+#       delete
+#       public
+#       (private)
+#       show
+# files
+#       list
+#       upload
+#       download
+#       delete
+#       (rename) # more difficult as S3 requires to copy an object
 
+
+# (metadata)
+#        add
+#        search
+
+
+# (ecr:) # edge code repository
+# (app)
+#       (create)
+#       (delete)
+#       (show)
+#       (update) # update partial app definition 
+
+
+# (ecs:) # edge code scheduler
+# (job)
+#       (create)
+#       (delete)
+#       (show)
+#       (config) # send new config ?
 
 
 @click.group()
