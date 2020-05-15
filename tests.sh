@@ -92,7 +92,8 @@ fi
 # upload file as another key
 ./sage-cli.py storage files upload ${BUCKET_ID} ./README.md --key /directory/test.md
 
-sage-cli.py storage files list  ${BUCKET_ID} --recursive true | grep "directory/test.md"
+# check was uploaded with correct name
+./sage-cli.py storage files list  ${BUCKET_ID} --recursive true | grep "directory/test.md"
 
 
 echo "Tests successful."
