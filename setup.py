@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sage-cli',
-    version='0.1',
+    version='0.1.0',
     description='SAGE command line interface',
     url='https://github.com/sagecontinuum/sage-cli',
     install_requires=[
