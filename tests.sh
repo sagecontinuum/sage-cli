@@ -96,6 +96,27 @@ fi
 ./sage-cli.py storage files list  ${BUCKET_ID} --recursive true | grep "directory/test.md"
 
 
+#directory upload
+
+echo "test_a" > temp/a.txt
+
+mkdir -p ./temp/dir1/
+echo "test_b" > temp/dir1/b.txt
+echo "test_c" > temp/dir1/c.txt
+
+mkdir -p ./temp/dir1/dir2/
+echo "test_d" > temp/dir1/dir2/d.txt
+
+./sage-cli.py storage files upload ${BUCKET_ID} ./temp --key /dir-test/
+
+COUNT=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | jq '. | length')
+if [ ${COUNT} -ne 4 ] ; then
+    fatal "File number does not match"
+fi
+
+
+
+
 echo "Tests successful."
 
 
