@@ -76,6 +76,9 @@ def cli(ctx, debug, host, token):
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
         ctx.obj['DEBUG'] = True
     
+    
+    host = host.rstrip('/')
+    
     ctx.obj['TOKEN'] = token
     ctx.obj['HOST'] = host
     
@@ -119,6 +122,7 @@ def bucketCreate(ctx, name, datatype):
         PrintException()
         sys.exit(1)
 
+    
     
     print(json.dumps(bucket, indent=2))
     if 'error' in bucket:
