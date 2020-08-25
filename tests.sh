@@ -88,10 +88,17 @@ if [ ${PERM_COUNT} -ne 0 ] ; then
 fi
 
 
+# upload file
+FILES_UPLOADED=$(./sage-cli.py storage files upload ${BUCKET_ID} ./README.md | jq '.files_uploaded')
+if [ ${FILES_UPLOADED} -ne 1 ] ; then
+    fatal "upload failed"
+fi
 
 # upload file as another key
-./sage-cli.py storage files upload ${BUCKET_ID} ./README.md --key /directory/test.md
-
+FILES_UPLOADED=$(./sage-cli.py storage files upload ${BUCKET_ID} ./README.md --key /directory/test.md | jq '.files_uploaded')
+if [ ${FILES_UPLOADED} -ne 1 ] ; then
+    fatal "upload failed"
+fi
 # check was uploaded with correct name
 ./sage-cli.py storage files list  ${BUCKET_ID} --recursive true | grep "directory/test.md"
 
@@ -109,9 +116,9 @@ echo "test_d" > temp/dir1/dir2/d.txt
 
 ./sage-cli.py storage files upload ${BUCKET_ID} ./temp --key /dir-test/
 
-COUNT=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | jq '. | length')
-if [ ${COUNT} -ne 4 ] ; then
-    fatal "File number does not match"
+LIST=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | jq -cS '.')
+if [ ${LIST}_ != '["dir-test/temp/a.txt","dir-test/temp/dir1/b.txt","dir-test/temp/dir1/c.txt","dir-test/temp/dir1/dir2/d.txt"]_' ] ; then
+    fatal "List of files do not match"
 fi
 
 
