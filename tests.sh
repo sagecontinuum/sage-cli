@@ -50,7 +50,7 @@ echo "BUCKET_ID=${BUCKET_ID}"
 ./sage-cli.py storage files upload ${BUCKET_ID} ./README.md
 
 # check
-FILE_FOUND=$(./sage-cli.py storage files list ${BUCKET_ID} |  jq -r '.[0]')
+FILE_FOUND=$(./sage-cli.py storage files list ${BUCKET_ID} | cut -f 1  -d ' ' )
 
 if [ ${FILE_FOUND}_ != "README.md_" ] ; then
     fatal "file not found"
@@ -116,8 +116,8 @@ echo "test_d" > temp/dir1/dir2/d.txt
 
 ./sage-cli.py storage files upload ${BUCKET_ID} ./temp --key /dir-test/
 
-LIST=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | jq -cS '.')
-if [ ${LIST}_ != '["dir-test/temp/a.txt","dir-test/temp/dir1/b.txt","dir-test/temp/dir1/c.txt","dir-test/temp/dir1/dir2/d.txt"]_' ] ; then
+LIST=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | cut -f 1 -d ' ' | tr '\n' '_' )
+if [ ${LIST}_ != "/dir-test/temp/a.txt_/dir-test/temp/dir1/b.txt_/dir-test/temp/dir1/c.txt_/dir-test/temp/dir1/dir2/d.txt_"_ ] ; then
     fatal "List of files do not match"
 fi
 
