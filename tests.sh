@@ -11,8 +11,8 @@ fatal() {
   exit 1
 }
 
-if [ -z ${SAGE_HOST} ] ; then
-    fatal "Environment variable SAGE_HOST not defined"
+if [ -z ${SAGE_STORE_URL} ] ; then
+    fatal "Environment variable SAGE_STORE_URL not defined"
 fi
 
 if [ -z ${SAGE_USER_TOKEN} ] ; then
