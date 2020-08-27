@@ -334,7 +334,7 @@ def fileUpload(ctx, bucket_id, key, target):
 @click.pass_context
 @click.argument('bucket_id')
 @click.option('--prefix', help='choose subdirectory')
-@click.option('--recursive', default=False)
+@click.option('--recursive/--no-recursive', default=False, )
 @click.option('--limit', required=False, type=int)
 @click.option('--all/--no-all', default=False, help='lists all files without pagination')
 @click.option('--format', default='table', help='table (default), json')
@@ -372,6 +372,8 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
             sys.exit(1)
         
         
+        isTruncated = 'IsTruncated' in result  and result['IsTruncated']
+
         if format=='json':
             print(json.dumps(result, indent=2))
 
@@ -381,7 +383,16 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
             print("---")
 
         if format=='table':
-            if "Contents" in result:
+            if not recursive:
+                if "CommonPrefixes" in result and result["CommonPrefixes"] != None and len(result["CommonPrefixes"]) != 0:
+                    for key in result["CommonPrefixes"]:
+                        if "Prefix" in key:
+                            print(key["Prefix"])
+                        else:
+                            print("Field \"Prefix\" missing")
+                            sys.exit(1)
+
+            if "Contents" in result and result["Contents"] != None:
                 for item in result["Contents"]:
                     if "Key" in item:
                         print("{}{} {} {}".format(prefix_str, item.get("Key"), item.get("Size"), item.get("LastModified")))
@@ -390,7 +401,10 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
                         sys.exit(1)
 
 
-            if not all:         
+            if not all:
+                if isTruncated:
+                    print("# results have been truncated")
+                    print( "# NextContinuationToken={}".format(result['NextContinuationToken']) ) 
                 break
 
                 #for key in result["Contents"][:-1]:
@@ -408,7 +422,7 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
 
         
 
-        if not ( 'IsTruncated' in result  and result['IsTruncated']):
+        if not ( isTruncated):
             break
 
         if not 'NextContinuationToken' in result:
