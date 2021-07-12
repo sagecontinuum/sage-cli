@@ -41,7 +41,7 @@ import os
 #       (create)
 #       (delete)
 #       (show)
-#       (update) # update partial app definition 
+#       (update) # update partial app definition
 
 
 # (ecs:) # edge code scheduler
@@ -72,7 +72,7 @@ def PrintException():
 @click.option('--debug/--no-debug', default=False)
 @click.pass_context
 def cli(ctx, debug, sage_store_url, token):
-    
+
     # ensure that ctx.obj exists and is a dict (in case `cli()` is called
     # by means other than the `if` block below)
     ctx.ensure_object(dict)
@@ -80,22 +80,22 @@ def cli(ctx, debug, sage_store_url, token):
     if debug:
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
         ctx.obj['DEBUG'] = True
-    
+
     if not sage_store_url:
         print("Please specifiy --sage_store_url or SAGE_STORE_URL")
         sys.exit(1)
-    
+
     sage_store_url = sage_store_url.rstrip('/')
-    
+
     ctx.obj['TOKEN'] = token
     ctx.obj['SAGE_STORE_URL'] = sage_store_url
-    
-    
+
+
 
 @cli.command(help='show config')
 @click.pass_context
 def config(ctx):
-   
+
     print("SAGE_STORE_URL: "+os.environ.get("SAGE_STORE_URL", "N/A"))
 
     print("SAGE_USER_TOKEN: "+os.environ.get("SAGE_USER_TOKEN", "N/A"))
@@ -115,7 +115,7 @@ def storage(ctx):
 @click.pass_context
 def bucket(ctx):
     pass
-   
+
 @storage.group(help='bucket permissions (private, public, sharing, ...)')
 @click.pass_context
 def permissions(ctx):
@@ -131,18 +131,19 @@ def files(ctx):
 @click.pass_context
 @click.option('--name', help='name of bucket')
 @click.option('--datatype', required=True, help='datatype of bucket')
-def bucketCreate(ctx, name, datatype):
+@click.option('--public', is_flag=True, help="make bucket public")
+def bucketCreate(ctx, name, datatype, public):
 
 
-   
+
     try:
-        bucket = sage_storage.createBucket(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], datatype=datatype, name=name)
+        bucket = sage_storage.createBucket(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], datatype=datatype, name=name, public=public)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
-    
+
+
     print(json.dumps(bucket, indent=2))
     if 'error' in bucket:
         sys.exit(1)
@@ -153,14 +154,14 @@ def bucketCreate(ctx, name, datatype):
 def bucketShow(ctx, id):
 
 
-   
+
     try:
         bucket = sage_storage.showBucket(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(bucket, indent=2))
     if 'error' in bucket:
         sys.exit(1)
@@ -172,14 +173,14 @@ def bucketShow(ctx, id):
 def bucketDelete(ctx, id):
 
 
-   
+
     try:
         bucket = sage_storage.deleteBucket(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(bucket, indent=2))
     if 'error' in bucket:
         sys.exit(1)
@@ -190,14 +191,14 @@ def bucketDelete(ctx, id):
 def bucketList(ctx):
 
 
-   
+
     try:
         bucket = sage_storage.listBuckets(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'])
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(bucket, indent=2))
     if 'error' in bucket:
         sys.exit(1)
@@ -209,18 +210,18 @@ def bucketList(ctx):
 def permissionsGet(ctx, id):
 
 
-   
+
     try:
         p = sage_storage.getPermissions(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=id)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(p, indent=2))
     if 'error' in p:
         sys.exit(1)
-    
+
 
 
 #{"granteeType": "USER", "grantee": "otheruser", "permission": "READ"}'
@@ -231,15 +232,15 @@ def permissionsGet(ctx, id):
 @click.argument('grantee')      # user or group to get permission
 @click.argument('permission')   # possible permisson: READ, WRITE, READ_ACL, WRITE_ACL
 def permissionsAdd(ctx, bucket_id, granteetype, grantee, permission):
-    # example: <BUCKET_ID> USER  otheruser READ 
-   
+    # example: <BUCKET_ID> USER  otheruser READ
+
     try:
         p = sage_storage.addPermissions(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(p, indent=2))
     if 'error' in p:
         sys.exit(1)
@@ -249,14 +250,14 @@ def permissionsAdd(ctx, bucket_id, granteetype, grantee, permission):
 @click.pass_context
 @click.argument('bucket_id')
 def bucketMakePublic(ctx, bucket_id):
-  
+
     try:
         p = sage_storage.makePublic(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(p, indent=2))
     if 'error' in p:
         sys.exit(1)
@@ -270,14 +271,14 @@ def bucketMakePublic(ctx, bucket_id):
 @click.argument('grantee')
 @click.option('--permission', help='remove only specific permission from grantee')
 def permissionDelete(ctx, bucket_id, granteetype, grantee, permission):
-  
+
     try:
         p = sage_storage.deletePermissions(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id, granteeType=granteetype, grantee=grantee, permission=permission)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(p, indent=2))
     if 'error' in p:
         sys.exit(1)
@@ -292,14 +293,14 @@ def permissionDelete(ctx, bucket_id, granteetype, grantee, permission):
 def fileUpload(ctx, bucket_id, files, key):
 
 
-   
+
     try:
         result = sage_storage.upload(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id, sources=files, key=key)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(result, indent=2))
     if isinstance(result,dict):
         if 'error' in result:
@@ -322,7 +323,7 @@ def fileUpload(ctx, bucket_id, key, target):
         PrintException()
         sys.exit(1)
 
-    
+
     #print(json.dumps(result, indent=2))
     #if 'error' in result:
     #    sys.exit(1)
@@ -340,7 +341,7 @@ def fileUpload(ctx, bucket_id, key, target):
 @click.option('--format', default='table', help='table (default), json')
 @click.option('--ctoken', required=False, type=str , help='continuationToken')
 def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
-    
+
 
     if prefix:
         if prefix[-1] != "/":
@@ -349,13 +350,13 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
         prefix_str = prefix
     else:
         prefix_str = ""
-    
+
     page = 0
     #ctoken = ""
     while True:
         page += 1
         try:
-            
+
             result = sage_storage.listFiles(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id, prefix=prefix, recursive=recursive, cToken=ctoken, limit=limit)
         except Exception:
             PrintException()
@@ -370,14 +371,14 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
             else:
                 print(json.dumps(result['error'], indent=2))
             sys.exit(1)
-        
-        
+
+
         isTruncated = 'IsTruncated' in result  and result['IsTruncated']
 
         if format=='json':
             print(json.dumps(result, indent=2))
 
-            if not all:         
+            if not all:
                 break
 
             print("---")
@@ -404,23 +405,23 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
             if not all:
                 if isTruncated:
                     print("# results have been truncated")
-                    print( "# NextContinuationToken={}".format(result['NextContinuationToken']) ) 
+                    print( "# NextContinuationToken={}".format(result['NextContinuationToken']) )
                 break
 
                 #for key in result["Contents"][:-1]:
                 #    print(json.dumps(key)+",")
-                
+
 
                 #print(json.dumps(result["Contents"][-1]))
 
 
 
-        #result["Contents"]=None    
+        #result["Contents"]=None
         #print(result)
         #sys.exit(0)
         #print("page: {} ({})".format(page, ctoken))
 
-        
+
 
         if not ( isTruncated):
             break
@@ -434,9 +435,9 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
             sys.exit(1)
 
         ctoken=result['NextContinuationToken']
-        
 
-    
+
+
     #print(json.dumps(result, indent=2))
     if 'error' in result:
         sys.exit(1)
@@ -449,14 +450,14 @@ def filesList(ctx, bucket_id, prefix, recursive, limit, all, format, ctoken):
 #@click.option('--recursive', default=False)
 def fileDelete(ctx, bucket_id, key):
 
-   
+
     try:
         result = sage_storage.deleteFile(host=ctx.obj['SAGE_STORE_URL'], token=ctx.obj['TOKEN'], bucketID=bucket_id, key=key)
     except Exception as e:
         PrintException()
         sys.exit(1)
 
-    
+
     print(json.dumps(result, indent=2))
     if 'error' in result:
         sys.exit(1)
