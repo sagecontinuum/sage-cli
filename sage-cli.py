@@ -335,7 +335,7 @@ def fileUpload(ctx, bucket_id, key, target):
 @click.pass_context
 @click.argument('bucket_id')
 @click.option('--prefix', help='choose subdirectory')
-@click.option('--recursive/--no-recursive', default=False, )
+@click.option('--recursive/--no-recursive', default=False)
 @click.option('--limit', required=False, type=int)
 @click.option('--all/--no-all', default=False, help='lists all files without pagination')
 @click.option('--format', default='table', help='table (default), json')

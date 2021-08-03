@@ -7,7 +7,7 @@
 # - SAGE_HOST and SAGE_USER_TOKEN environment variables
 
 fatal() {
-  echo -e '\033[0;31m' $* 
+  echo -e '\033[0;31m' $*
   exit 1
 }
 
@@ -57,7 +57,7 @@ if [ ${FILE_FOUND}_ != "README.md_" ] ; then
 fi
 
 
-# download file 
+# download file
 mkdir -p temp/
 ./sage-cli.py storage files download ${BUCKET_ID} README.md --target temp/test.md
 
@@ -82,7 +82,7 @@ fi
 ./sage-cli.py storage permissions delete ${BUCKET_ID} GROUP AllUsers
 
 # check that AllUsers has no permissions
-PERM_COUNT=$(./sage-cli.py storage permissions show  d73cae07-0e56-4521-a662-e312def56540 | jq  '.[] | select(.grantee=="AllUsers") ' | wc -l)
+PERM_COUNT=$(./sage-cli.py storage permissions show  ${BUCKET_ID} | jq  '.[] | select(.grantee=="AllUsers") ' | wc -l)
 if [ ${PERM_COUNT} -ne 0 ] ; then
     fatal "AllUsers still has permissions"
 fi
@@ -100,7 +100,7 @@ if [ ${FILES_UPLOADED} -ne 1 ] ; then
     fatal "upload failed"
 fi
 # check was uploaded with correct name
-./sage-cli.py storage files list  ${BUCKET_ID} --recursive true | grep "directory/test.md"
+./sage-cli.py storage files list  ${BUCKET_ID} --recursive | grep "directory/test.md"
 
 
 #directory upload
@@ -116,7 +116,7 @@ echo "test_d" > temp/dir1/dir2/d.txt
 
 ./sage-cli.py storage files upload ${BUCKET_ID} ./temp --key /dir-test/
 
-LIST=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive=true | cut -f 1 -d ' ' | tr '\n' '_' )
+LIST=$(./sage-cli.py storage files list ${BUCKET_ID} --prefix /dir-test/ --recursive | cut -f 1 -d ' ' | tr '\n' '_' )
 if [ ${LIST}_ != "/dir-test/temp/a.txt_/dir-test/temp/dir1/b.txt_/dir-test/temp/dir1/c.txt_/dir-test/temp/dir1/dir2/d.txt_"_ ] ; then
     fatal "List of files do not match"
 fi
